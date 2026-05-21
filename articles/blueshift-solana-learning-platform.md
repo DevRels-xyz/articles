@@ -60,13 +60,13 @@ If you're already shipping on Solana and want to go deeper:
 
 1. Skip the intro
 2. Jump into the Pinocchio courses or the assembly track
-3. Follow [@blueshift_gg](https://x.com/blueshift_gg) for new research drops
+3. Follow [@blueshift](https://x.com/blueshift) for new research drops
 
 ## Resources
 
 - **Learn:** [learn.blueshift.gg](https://learn.blueshift.gg)
 - **Main site:** [blueshift.gg](https://blueshift.gg)
 - **GitHub:** [blueshift-gg](https://github.com/blueshift-gg) — including the open-source dashboard at [blueshift-dashboard](https://github.com/blueshift-gg/blueshift-dashboard)
-- **X:** [@blueshift_gg](https://x.com/blueshift_gg)
+- **X:** [@blueshift](https://x.com/blueshift)
 
 If you maintain a Solana team and you're trying to figure out where to point new hires for their first 40 hours of Solana onboarding — Blueshift is the most concrete answer right now.
