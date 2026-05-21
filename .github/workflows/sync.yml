@@ -1,0 +1,65 @@
+name: Sync to devrels.xyz
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "articles/**.md"
+
+concurrency:
+  group: sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm ci
+
+      - name: Determine changed articles
+        id: changed
+        run: |
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            # Initial push — sync everything
+            FILES=$(ls articles/*.md | grep -v 'articles/template.md' || true)
+          else
+            FILES=$(git diff --name-only --diff-filter=AM ${{ github.event.before }} ${{ github.sha }} -- 'articles/*.md' | grep -v 'articles/template.md' || true)
+          fi
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "Files to sync:"
+          echo "$FILES"
+
+      - name: Sync articles
+        if: steps.changed.outputs.files != ''
+        env:
+          ARTICLES_SYNC_URL: ${{ secrets.ARTICLES_SYNC_URL }}
+          ARTICLES_SYNC_SECRET: ${{ secrets.ARTICLES_SYNC_SECRET }}
+        run: |
+          echo "${{ steps.changed.outputs.files }}" | xargs node scripts/sync.mjs
+
+      - name: Handle deletions
+        if: github.event.before != '0000000000000000000000000000000000000000'
+        env:
+          ARTICLES_SYNC_URL: ${{ secrets.ARTICLES_SYNC_URL }}
+          ARTICLES_SYNC_SECRET: ${{ secrets.ARTICLES_SYNC_SECRET }}
+        run: |
+          DELETED=$(git diff --name-only --diff-filter=D ${{ github.event.before }} ${{ github.sha }} -- 'articles/*.md' || true)
+          for f in $DELETED; do
+            slug=$(basename "$f" .md)
+            echo "Deleting slug=$slug"
+            curl -fsS -X DELETE \
+              -H "x-sync-secret: $ARTICLES_SYNC_SECRET" \
+              "${ARTICLES_SYNC_URL}?slug=${slug}"
+            echo
+          done

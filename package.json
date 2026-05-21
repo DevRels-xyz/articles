@@ -1,0 +1,13 @@
+{
+  "name": "devrels-articles",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "lint": "node scripts/lint.mjs",
+    "sync": "node scripts/sync.mjs"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3"
+  }
+}
