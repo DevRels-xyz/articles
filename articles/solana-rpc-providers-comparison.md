@@ -143,6 +143,41 @@ The product surface is the broadest of the five:
 - You're a startup applying to their $20M fund for credits
 - You're already an Alchemy Ethereum customer and consolidation simplifies billing
 
+## Wait — do you need a paid provider at all?
+
+Before paying anyone, know that there are **free public Solana RPCs**. The official ones:
+
+- `https://api.mainnet-beta.solana.com` — public mainnet
+- `https://api.devnet.solana.com` — devnet
+- `https://api.testnet.solana.com` — testnet
+
+These exist, they work, and the Solana Foundation pays to keep them running. But they are **not designed for production traffic**. Specifically:
+
+- **Rate limits are aggressive.** You'll hit 429s fast — typically around 40 requests per 10 seconds per IP. A single page render with a few token balance queries can blow this in one second.
+- **No SLA.** They go down, they get slow, they return stale data. There's no support, no status page, no remediation.
+- **Heavy methods are throttled harder.** `getProgramAccounts`, `getSignaturesForAddress`, archival queries — basically anything useful — gets limited well below the basic per-request rate.
+- **No `sendTransaction` priority forwarding.** Transactions submitted through public endpoints land at the same priority as everyone else's, which during congestion means "rarely".
+- **No gRPC, no enhanced APIs, no webhooks.** Just the standard JSON-RPC surface.
+
+**When the free public RPC is genuinely fine:**
+
+- **Local development** — running scripts against your own machine, prototyping, exploring the API. No reason to burn a paid quota.
+- **Devnet / testnet** — paid providers' devnet/testnet tiers are usually free or near-free anyway; the public devnet endpoint works fine for early integration work.
+- **One-shot CLI commands** — `solana balance`, `solana program show`, the occasional ad-hoc check.
+- **Hobby projects with single-digit daily users** — a personal dashboard you'll check once a day.
+
+**When you have outgrown the free public RPC:**
+
+- **You see 429s in your logs.** Once is bad luck; a pattern is a signal.
+- **You're submitting transactions in any consequential way.** Move to a provider with stake-weighted forwarding (Helius Sender, Triton, others).
+- **You need realtime data.** Polling the public endpoint at any meaningful rate gets you rate-limited; gRPC streaming from a real provider is the answer.
+- **Your users notice the latency.** Public endpoint roundtrips can be 200-800ms depending on your region; paid bare-metal hits 30-80ms.
+- **You're shipping anything you'd be embarrassed to have go down.** SLA matters.
+
+A practical pattern: **use the public RPC for devnet and local development, switch to a paid provider when you deploy to mainnet, even if your traffic is initially small**. The marginal cost of a free-tier paid plan ($0–$50/month at most providers) is much smaller than the cost of debugging mysterious 429s in production.
+
+The other practical pattern: **community-run free RPCs**. Several validator and infra teams run public-good RPCs at no cost (some with API key gating, some completely open). [extrnode](https://extrnode.com) and similar can be a middle ground between the official public RPC and a paid provider. Reliability varies; check status pages.
+
 ## How to actually choose
 
 If you're paralysed, here's the heuristic:
