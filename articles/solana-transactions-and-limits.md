@@ -1,7 +1,7 @@
 ---
 title: "How Solana transactions actually work — and where the limits bite"
 slug: solana-transactions-and-limits
-summary: A Solana transaction is a tightly-constrained envelope: 1232 bytes, atomic execution, deterministic ordering. Understanding the limits is the difference between "my transaction fails for no reason" and "I'm shipping resilient on-chain code."
+summary: 'A Solana transaction is a tightly-constrained envelope: 1232 bytes, atomic execution, deterministic ordering. Understanding the limits is the difference between "my transaction fails for no reason" and "I''m shipping resilient on-chain code."'
 author_twitter: metasal
 author_name: metasal
 tags: [transactions, fundamentals, limits, performance, compute]
